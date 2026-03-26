@@ -26,6 +26,8 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
+app.get('/ping', (req, res) => res.send('pong'));
+
 app.listen(PORT, () => {
   console.log(`Result Checker running → http://localhost:${PORT}`);
 });
