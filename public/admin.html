@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel — CheckResult.ng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .page { max-width: 860px; margin: 0 auto; padding: 2rem 1rem; }
+
+    /* Login screen */
+    #login-screen {
+      min-height: calc(100vh - 60px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    .login-card { width: 100%; max-width: 380px; padding: 2rem; }
+    .login-header { text-align: center; margin-bottom: 1.75rem; }
+    .login-header .icon {
+      width: 52px; height: 52px;
+      background: var(--teal-light);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+      color: var(--teal);
+    }
+
+    /* Dashboard */
+    #dashboard-screen { display: none; }
+    #dashboard-screen.visible { display: block; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .upload-card { padding: 1.5rem; margin-bottom: 1.5rem; }
+    .upload-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 0.75rem;
+      align-items: flex-end;
+    }
+    .file-info {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+    }
+
+    .batches-card { padding: 1.5rem; }
+    .batch-name { font-weight: 600; font-size: 0.9rem; }
+    .batch-date { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.15rem; }
+
+    .progress-bar-wrap {
+      background: var(--border);
+      border-radius: 999px;
+      height: 4px;
+      margin-top: 0.5rem;
+      overflow: hidden;
+      display: none;
+    }
+    .progress-bar-wrap.visible { display: block; }
+    .progress-bar {
+      height: 100%;
+      background: var(--teal);
+      border-radius: 999px;
+      transition: width 0.3s var(--ease);
+      width: 0%;
+    }
+
+    .upload-result { margin-top: 0.875rem; display: none; }
+    .upload-result.visible { display: block; }
+
+    @media (max-width: 600px) {
+      .upload-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        <div class="dot"></div>
+        Check<span>Result</span>.ng
+      </a>
+      <div id="nav-right" class="navbar-right" style="display:none">
+        <button class="btn btn-outline btn-sm" id="logout-btn">Log out</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Login screen -->
+  <div id="login-screen">
+    <div class="card login-card">
+      <div class="login-header">
+        <div class="icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <h1 style="font-size:1.2rem;margin-bottom:0.3rem">Admin Panel</h1>
+        <p style="font-size:0.85rem;color:var(--text-muted)">Enter your password to continue</p>
+      </div>
+      <div id="login-error" class="alert alert-error" style="display:none;margin-bottom:1rem"></div>
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="password-input">Password</label>
+          <input id="password-input" type="password" class="form-control" placeholder="••••••••" required autofocus>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full" id="login-btn">Log In</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard screen -->
+  <div id="dashboard-screen">
+    <div class="page">
+
+      <!-- Stats -->
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-students">—</div>
+          <div class="stat-label">Students</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-rows">—</div>
+          <div class="stat-label">Result Rows</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-batches">—</div>
+          <div class="stat-label">Batches</div>
+        </div>
+      </div>
+
+      <!-- Upload -->
+      <div class="card upload-card">
+        <h2 style="margin-bottom:1.25rem">Upload Results CSV</h2>
+
+        <div class="file-info">
+          Required columns: <strong>PIN, Student_Name, Subject</strong> &nbsp;|&nbsp;
+          Optional: School, Class, Term, Year, Score, Grade, Remark
+        </div>
+
+        <hr class="divider" style="margin:1rem 0">
+
+        <form id="upload-form">
+          <div class="upload-row">
+            <div class="form-group" style="margin:0">
+              <label class="form-label" for="batch-name">Batch Name</label>
+              <input id="batch-name" type="text" class="form-control" placeholder="e.g. JSS3 First Term 2024/2025">
+            </div>
+            <div class="form-group" style="margin:0">
+              <label class="form-label" for="csv-file">CSV File</label>
+              <input id="csv-file" type="file" class="form-control" accept=".csv" required>
+            </div>
+            <div>
+              <button type="submit" class="btn btn-primary" id="upload-btn" style="white-space:nowrap">Upload</button>
+            </div>
+          </div>
+          <div class="progress-bar-wrap" id="progress-wrap">
+            <div class="progress-bar" id="progress-bar"></div>
+          </div>
+          <div id="upload-result" class="upload-result"></div>
+        </form>
+      </div>
+
+      <!-- Batches table -->
+      <div class="card batches-card">
+        <div class="section-header">
+          <h2>Uploaded Batches</h2>
+          <button class="btn btn-outline btn-sm" id="refresh-btn">↻ Refresh</button>
+        </div>
+        <div id="batches-container">
+          <div class="empty-state"><p>Loading…</p></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="toast" class="toast hide"></div>
+
+  <script>
+    'use strict';
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = `toast ${type}`;
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.add('hide'), 3500);
+    }
+
+    // ── Auth check on load ──
+    async function init() {
+      const res = await fetch('/api/admin/status');
+      const data = await res.json();
+      if (data.authenticated) showDashboard();
+    }
+
+    function showDashboard() {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('dashboard-screen').classList.add('visible');
+      document.getElementById('nav-right').style.display = 'flex';
+      loadStats();
+      loadBatches();
+    }
+
+    // ── Login ──
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const password = document.getElementById('password-input').value;
+      const btn = document.getElementById('login-btn');
+      const errEl = document.getElementById('login-error');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>';
+      errEl.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showDashboard();
+        } else {
+          errEl.textContent = data.error || 'Login failed.';
+          errEl.style.display = 'block';
+        }
+      } catch {
+        errEl.textContent = 'Network error. Try again.';
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Log In';
+      }
+    });
+
+    // ── Logout ──
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      await fetch('/api/admin/logout', { method: 'POST' });
+      location.reload();
+    });
+
+    // ── Stats ──
+    async function loadStats() {
+      try {
+        const res  = await fetch('/api/admin/stats');
+        const data = await res.json();
+        document.getElementById('stat-students').textContent = data.total_students.toLocaleString();
+        document.getElementById('stat-rows').textContent     = data.total_rows.toLocaleString();
+        document.getElementById('stat-batches').textContent  = data.total_batches.toLocaleString();
+      } catch { /* silent */ }
+    }
+
+    // ── Batches ──
+    async function loadBatches() {
+      const container = document.getElementById('batches-container');
+      container.innerHTML = '<div class="empty-state"><p>Loading…</p></div>';
+
+      try {
+        const res    = await fetch('/api/admin/batches');
+        const batches = await res.json();
+
+        if (!batches.length) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <p>No batches uploaded yet. Upload a CSV to get started.</p>
+            </div>`;
+          return;
+        }
+
+        const rows = batches.map(b => `
+          <tr>
+            <td>
+              <div class="batch-name">${escapeHtml(b.name)}</div>
+              <div class="batch-date">${new Date(b.uploaded_at).toLocaleString('en-NG')}</div>
+            </td>
+            <td><span class="badge badge-teal">${b.student_count} students</span></td>
+            <td>${b.row_count} rows</td>
+            <td>
+              <button class="btn btn-danger" onclick="deleteBatch(${b.id}, this)">Delete</button>
+            </td>
+          </tr>
+        `).join('');
+
+        container.innerHTML = `
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Batch Name</th>
+                  <th>Students</th>
+                  <th>Rows</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>`;
+      } catch {
+        container.innerHTML = '<div class="empty-state"><p>Failed to load batches.</p></div>';
+      }
+    }
+
+    async function deleteBatch(id, btn) {
+      if (!confirm('Delete this batch and all its results? This cannot be undone.')) return;
+      btn.disabled = true;
+      btn.textContent = '…';
+      try {
+        const res = await fetch(`/api/admin/batches/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          showToast('Batch deleted.');
+          loadBatches();
+          loadStats();
+        } else {
+          showToast('Delete failed.', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Delete';
+        }
+      } catch {
+        showToast('Network error.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Delete';
+      }
+    }
+
+    // ── Upload ──
+    document.getElementById('upload-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const file = document.getElementById('csv-file').files[0];
+      if (!file) return;
+
+      const batchName = document.getElementById('batch-name').value.trim();
+      const btn       = document.getElementById('upload-btn');
+      const resultEl  = document.getElementById('upload-result');
+      const progressWrap = document.getElementById('progress-wrap');
+      const progressBar  = document.getElementById('progress-bar');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>';
+      resultEl.className = 'upload-result';
+      progressWrap.classList.add('visible');
+      progressBar.style.width = '30%';
+
+      const form = new FormData();
+      form.append('csv', file);
+      if (batchName) form.append('batch_name', batchName);
+
+      try {
+        progressBar.style.width = '60%';
+        const res  = await fetch('/api/admin/upload', { method: 'POST', body: form });
+        const data = await res.json();
+        progressBar.style.width = '100%';
+
+        if (res.ok) {
+          resultEl.className = 'upload-result visible';
+          resultEl.innerHTML = `<div class="alert alert-success">✓ Uploaded ${data.inserted} rows successfully.</div>`;
+          document.getElementById('upload-form').reset();
+          loadBatches();
+          loadStats();
+          showToast(`${data.inserted} rows uploaded.`);
+        } else {
+          resultEl.className = 'upload-result visible';
+          resultEl.innerHTML = `<div class="alert alert-error">${escapeHtml(data.error)}</div>`;
+        }
+      } catch {
+        resultEl.className = 'upload-result visible';
+        resultEl.innerHTML = '<div class="alert alert-error">Upload failed. Check your connection.</div>';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Upload';
+        setTimeout(() => {
+          progressWrap.classList.remove('visible');
+          progressBar.style.width = '0%';
+        }, 800);
+      }
+    });
+
+    document.getElementById('refresh-btn').addEventListener('click', () => {
+      loadBatches();
+      loadStats();
+    });
+
+    init();
+  </script>
+</body>
+</html>

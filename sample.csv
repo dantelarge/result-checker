@@ -1,0 +1,16 @@
+PIN,Student_Name,School,Class,Term,Year,Subject,Score,Grade,Remark
+EX2024001,Chukwuemeka Eze,Lagos Academy,JSS3A,First Term,2024/2025,Mathematics,78,B,Good
+EX2024001,Chukwuemeka Eze,Lagos Academy,JSS3A,First Term,2024/2025,English Language,85,A,Excellent
+EX2024001,Chukwuemeka Eze,Lagos Academy,JSS3A,First Term,2024/2025,Basic Science,70,C,Average
+EX2024001,Chukwuemeka Eze,Lagos Academy,JSS3A,First Term,2024/2025,Social Studies,88,A,Excellent
+EX2024001,Chukwuemeka Eze,Lagos Academy,JSS3A,First Term,2024/2025,CRS,92,A,Outstanding
+EX2024002,Adaeze Okonkwo,Lagos Academy,JSS3A,First Term,2024/2025,Mathematics,65,C,Average
+EX2024002,Adaeze Okonkwo,Lagos Academy,JSS3A,First Term,2024/2025,English Language,91,A,Excellent
+EX2024002,Adaeze Okonkwo,Lagos Academy,JSS3A,First Term,2024/2025,Basic Science,80,B,Good
+EX2024002,Adaeze Okonkwo,Lagos Academy,JSS3A,First Term,2024/2025,Social Studies,76,B,Good
+EX2024002,Adaeze Okonkwo,Lagos Academy,JSS3A,First Term,2024/2025,CRS,84,A,Excellent
+EX2024003,Biodun Adeleke,Lagos Academy,JSS3B,First Term,2024/2025,Mathematics,55,D,Below Average
+EX2024003,Biodun Adeleke,Lagos Academy,JSS3B,First Term,2024/2025,English Language,62,C,Average
+EX2024003,Biodun Adeleke,Lagos Academy,JSS3B,First Term,2024/2025,Basic Science,58,D,Below Average
+EX2024003,Biodun Adeleke,Lagos Academy,JSS3B,First Term,2024/2025,Social Studies,71,C,Average
+EX2024003,Biodun Adeleke,Lagos Academy,JSS3B,First Term,2024/2025,CRS,79,B,Good

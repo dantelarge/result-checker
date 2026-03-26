@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CheckResult.ng — Check Your Result</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .hero {
+      min-height: calc(100vh - 60px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 3rem 1rem 2rem;
+      gap: 2rem;
+    }
+    .pin-section {
+      width: 100%;
+      max-width: 420px;
+    }
+    .pin-card {
+      padding: 2rem;
+    }
+    .pin-card-header {
+      text-align: center;
+      margin-bottom: 1.75rem;
+    }
+    .pin-card-header .icon {
+      width: 52px; height: 52px;
+      background: var(--teal-light);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      color: var(--teal);
+    }
+    .pin-card-header h1 {
+      font-size: 1.3rem;
+      margin-bottom: 0.35rem;
+    }
+    .pin-card-header p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    #result-section {
+      width: 100%;
+      max-width: 720px;
+      display: none;
+    }
+    #result-section.visible { display: block; }
+    .slip-summary {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .slip-summary strong { color: var(--text); }
+    .subject-score { font-weight: 600; }
+    .no-result { display: none; margin-top: 1rem; }
+    .no-result.visible { display: block; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        <div class="dot"></div>
+        Check<span>Result</span>.ng
+      </a>
+      <div class="navbar-right">Student Portal</div>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <!-- PIN input card -->
+    <div class="pin-section">
+      <div class="card pin-card">
+        <div class="pin-card-header">
+          <div class="icon">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <h1>Check Your Result</h1>
+          <p>Enter the PIN given to you by your school</p>
+        </div>
+
+        <div id="check-error" class="alert alert-error no-result"></div>
+
+        <form id="check-form">
+          <div class="form-group">
+            <label class="form-label" for="pin-input">Examination PIN</label>
+            <input
+              id="pin-input"
+              type="text"
+              class="form-control pin-input"
+              placeholder="e.g. EX2024001"
+              maxlength="20"
+              autocomplete="off"
+              autocapitalize="characters"
+              required
+            >
+          </div>
+          <button type="submit" class="btn btn-primary btn-full" id="check-btn">
+            Check Result
+          </button>
+        </form>
+      </div>
+
+      <p style="text-align:center;font-size:0.78rem;color:var(--text-subtle);margin-top:1rem;">
+        PIN not working? Contact your school administrator.
+      </p>
+    </div>
+
+    <!-- Result slip -->
+    <div id="result-section">
+      <div class="result-slip" id="result-slip">
+        <!-- filled by JS -->
+      </div>
+      <div style="text-align:center;margin-top:1rem;" class="no-print">
+        <button class="btn btn-outline btn-sm" onclick="resetForm()">← Check Another Result</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    'use strict';
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function gradeClass(grade) {
+      const g = (grade || '').trim().toUpperCase();
+      if (g === 'A') return 'grade-a';
+      if (g === 'B') return 'grade-b';
+      if (g === 'C') return 'grade-c';
+      return 'grade-d';
+    }
+
+    function computeSummary(subjects) {
+      const numeric = subjects.map(s => parseFloat(s.score)).filter(n => !isNaN(n));
+      if (numeric.length === 0) return null;
+      const total   = numeric.reduce((a, b) => a + b, 0);
+      const average = (total / numeric.length).toFixed(1);
+      return { total, average, count: numeric.length };
+    }
+
+    function renderResult(data) {
+      const slip = document.getElementById('result-slip');
+      const summary = computeSummary(data.subjects);
+
+      const subjectRows = data.subjects.map(s => `
+        <tr>
+          <td>${escapeHtml(s.subject)}</td>
+          <td class="subject-score">${escapeHtml(s.score)}</td>
+          <td><span class="${gradeClass(s.grade)}">${escapeHtml(s.grade)}</span></td>
+          <td style="color:var(--text-muted)">${escapeHtml(s.remark)}</td>
+        </tr>
+      `).join('');
+
+      const summaryRow = summary ? `
+        <tr style="background:var(--bg)">
+          <td style="font-weight:600">Total / Average</td>
+          <td style="font-weight:700;color:var(--teal)">${summary.total}</td>
+          <td></td>
+          <td style="color:var(--text-muted)">Avg: ${summary.average}</td>
+        </tr>
+      ` : '';
+
+      slip.innerHTML = `
+        <div class="slip-header">
+          <h2>${escapeHtml(data.school || 'School Result Slip')}</h2>
+          <p>${escapeHtml(data.batch_name)}</p>
+        </div>
+
+        <div class="slip-meta">
+          <div class="meta-item">
+            <label>Student Name</label>
+            <span>${escapeHtml(data.student_name)}</span>
+          </div>
+          <div class="meta-item">
+            <label>Class</label>
+            <span>${escapeHtml(data.class || '—')}</span>
+          </div>
+          <div class="meta-item">
+            <label>Term</label>
+            <span>${escapeHtml(data.term || '—')}</span>
+          </div>
+          <div class="meta-item">
+            <label>Academic Year</label>
+            <span>${escapeHtml(data.year || '—')}</span>
+          </div>
+        </div>
+
+        <div class="slip-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Subject</th>
+                  <th>Score</th>
+                  <th>Grade</th>
+                  <th>Remark</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${subjectRows}
+                ${summaryRow}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="slip-footer">
+          <span>Generated by CheckResult.ng</span>
+          <button class="btn btn-outline btn-sm no-print" onclick="window.print()">
+            🖨 Print Result
+          </button>
+        </div>
+      `;
+
+      document.getElementById('result-section').classList.add('visible');
+      document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function resetForm() {
+      document.getElementById('result-section').classList.remove('visible');
+      document.getElementById('check-error').classList.remove('visible');
+      document.getElementById('pin-input').value = '';
+      document.getElementById('pin-input').focus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.getElementById('check-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const pin = document.getElementById('pin-input').value.trim();
+      if (!pin) return;
+
+      const btn = document.getElementById('check-btn');
+      const errEl = document.getElementById('check-error');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Checking…';
+      errEl.classList.remove('visible');
+      document.getElementById('result-section').classList.remove('visible');
+
+      try {
+        const res = await fetch('/api/results/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Something went wrong.';
+          errEl.classList.add('visible');
+        } else {
+          renderResult(data);
+        }
+      } catch {
+        errEl.textContent = 'Network error. Please try again.';
+        errEl.classList.add('visible');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Check Result';
+      }
+    });
+  </script>
+</body>
+</html>
