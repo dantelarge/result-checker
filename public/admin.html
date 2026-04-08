@@ -3,181 +3,769 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel — CheckResult.ng</title>
+  <title>Admin — CheckResult.ng</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <style>
-    .page { max-width: 860px; margin: 0 auto; padding: 2rem 1rem; }
 
-    /* Login screen */
+    /* ═══════════════════════════════════════
+       LOGIN — split screen
+    ═══════════════════════════════════════ */
     #login-screen {
-      min-height: calc(100vh - 60px);
+      display: grid;
+      grid-template-columns: 45fr 55fr;
+      min-height: 100vh;
+    }
+
+    .login-brand {
+      background: linear-gradient(145deg, #0f766e 0%, #0d9488 60%, #14b8a6 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 3rem 3rem;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .login-brand::before {
+      content: '';
+      position: absolute;
+      width: 320px; height: 320px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+      top: -80px; right: -80px;
+    }
+    .login-brand::after {
+      content: '';
+      position: absolute;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+      bottom: -40px; left: -40px;
+    }
+    .brand-logo {
       display: flex;
       align-items: center;
-      justify-content: center;
-      padding: 2rem 1rem;
+      gap: 0.6rem;
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 2.5rem;
+      position: relative;
+      z-index: 1;
     }
-    .login-card { width: 100%; max-width: 380px; padding: 2rem; }
-    .login-header { text-align: center; margin-bottom: 1.75rem; }
-    .login-header .icon {
-      width: 52px; height: 52px;
-      background: var(--teal-light);
+    .brand-logo .dot {
+      width: 10px; height: 10px;
+      background: rgba(255,255,255,0.7);
       border-radius: 50%;
+    }
+    .brand-tagline {
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+    .brand-sub {
+      font-size: 0.95rem;
+      opacity: 0.8;
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .brand-features {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      position: relative;
+      z-index: 1;
+    }
+    .brand-feature {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.875rem;
+      opacity: 0.9;
+    }
+    .brand-feature-icon {
+      width: 28px; height: 28px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 6px;
       display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 1rem;
-      color: var(--teal);
+      flex-shrink: 0;
     }
 
-    /* Dashboard */
+    .login-form-panel {
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2.5rem;
+    }
+    .login-form-inner {
+      width: 100%;
+      max-width: 360px;
+    }
+    .login-form-header {
+      margin-bottom: 2rem;
+    }
+    .login-form-header h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+    .login-form-header p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    .pw-wrap {
+      position: relative;
+    }
+    .pw-wrap .form-control {
+      padding-right: 2.75rem;
+    }
+    .pw-toggle {
+      position: absolute;
+      right: 0.75rem; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      cursor: pointer; color: var(--text-muted);
+      display: flex; align-items: center;
+      padding: 0;
+    }
+    .pw-toggle:hover { color: var(--teal); }
+
+    @media (max-width: 700px) {
+      #login-screen { grid-template-columns: 1fr; }
+      .login-brand { padding: 2rem 1.5rem; min-height: auto; }
+      .brand-tagline { font-size: 1.4rem; }
+    }
+
+    /* ═══════════════════════════════════════
+       DASHBOARD
+    ═══════════════════════════════════════ */
     #dashboard-screen { display: none; }
     #dashboard-screen.visible { display: block; }
 
-    .section-header {
+    /* Top bar */
+    .admin-bar {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 0 1.5rem;
+      height: 60px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+    .admin-bar-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .admin-bar-brand .dot {
+      width: 8px; height: 8px;
+      background: var(--teal);
+      border-radius: 50%;
+    }
+    .admin-bar-brand span { color: var(--teal); }
+    .admin-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .admin-badge {
+      background: var(--teal-light);
+      color: var(--teal-dark);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
 
-    .upload-card { padding: 1.5rem; margin-bottom: 1.5rem; }
-    .upload-row {
+    /* Hero strip */
+    .dashboard-hero {
+      background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+      color: #fff;
+      padding: 2.5rem 2rem 3.5rem;
+    }
+    .hero-inner {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .hero-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0.35rem;
+    }
+    .hero-sub {
+      font-size: 0.875rem;
+      opacity: 0.75;
+      margin-bottom: 2rem;
+    }
+    .hero-stats {
       display: grid;
-      grid-template-columns: 1fr 1fr auto;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      max-width: 540px;
+    }
+    .hero-stat {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+      backdrop-filter: blur(4px);
+    }
+    .hero-stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .hero-stat-label {
+      font-size: 0.7rem;
+      opacity: 0.75;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 0.35rem;
+    }
+
+    /* Main content (pulls up over hero) */
+    .dashboard-content {
+      max-width: 960px;
+      margin: -2rem auto 0;
+      padding: 0 1.5rem 3rem;
+    }
+
+    /* Section card */
+    .section-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+    .section-card-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .section-card-header-left {
+      display: flex;
+      align-items: center;
       gap: 0.75rem;
-      align-items: flex-end;
     }
-    .file-info {
-      font-size: 0.8rem;
+    .section-icon {
+      width: 36px; height: 36px;
+      background: var(--teal-light);
+      color: var(--teal);
+      border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .section-title { font-size: 1rem; font-weight: 700; }
+    .section-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.1rem; }
+    .section-card-body { padding: 1.5rem; }
+
+    /* Upload grid */
+    .upload-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    /* Drop zone */
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 2rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+      background: var(--bg);
+      position: relative;
+      min-height: 130px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--teal);
+      background: var(--teal-light);
+    }
+    .drop-zone input[type="file"] {
+      position: absolute; inset: 0;
+      opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .dz-icon { color: var(--teal); margin-bottom: 0.5rem; }
+    .dz-title { font-weight: 600; font-size: 0.9rem; color: var(--text); }
+    .dz-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; }
+
+    /* Format chips */
+    .format-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1.25rem;
+    }
+    .fmt-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.2rem 0.65rem;
+      font-size: 0.72rem;
+      font-weight: 600;
       color: var(--text-muted);
-      margin-top: 0.4rem;
+    }
+    .fmt-chip.required {
+      background: var(--teal-light);
+      border-color: var(--teal);
+      color: var(--teal-dark);
     }
 
-    .batches-card { padding: 1.5rem; }
-    .batch-name { font-weight: 600; font-size: 0.9rem; }
-    .batch-date { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.15rem; }
-
+    /* Progress */
     .progress-bar-wrap {
       background: var(--border);
       border-radius: 999px;
-      height: 4px;
-      margin-top: 0.5rem;
+      height: 5px;
+      margin: 1rem 0 0;
       overflow: hidden;
       display: none;
     }
     .progress-bar-wrap.visible { display: block; }
     .progress-bar {
       height: 100%;
-      background: var(--teal);
+      background: linear-gradient(90deg, var(--teal), #14b8a6);
       border-radius: 999px;
       transition: width 0.3s var(--ease);
       width: 0%;
     }
 
-    .upload-result { margin-top: 0.875rem; display: none; }
+    .upload-result { margin-top: 1rem; display: none; }
     .upload-result.visible { display: block; }
 
-    @media (max-width: 600px) {
-      .upload-row { grid-template-columns: 1fr; }
+    /* PIN panel */
+    .pin-panel {
+      margin-top: 1rem;
+      background: var(--teal-light);
+      border: 1px solid var(--teal);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      display: none;
+    }
+    .pin-panel-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.875rem;
+    }
+    .pin-panel-top h3 {
+      font-size: 0.9rem;
+      color: var(--teal-dark);
+      font-weight: 700;
+    }
+    .pin-list {
+      max-height: 200px;
+      overflow-y: auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 0.75rem;
+    }
+    .pin-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0.875rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.82rem;
+    }
+    .pin-row:last-child { border-bottom: none; }
+    .pin-val {
+      font-family: monospace;
+      font-weight: 700;
+      font-size: 0.875rem;
+      color: var(--teal-dark);
+      background: var(--teal-light);
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+    }
+    .pin-hint { font-size: 0.75rem; color: var(--teal-dark); opacity: 0.8; }
+
+    /* Batch table tweaks */
+    .batch-name { font-weight: 600; font-size: 0.9rem; }
+    .batch-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem; }
+    .batch-actions { display: flex; gap: 0.5rem; align-items: center; }
+
+    /* ── Tabs ── */
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      padding: 0 1.5rem;
+      background: var(--bg);
+    }
+    .tab-btn {
+      padding: 0.875rem 1.25rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: color var(--dur), border-color var(--dur);
+      margin-bottom: -1px;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--teal); border-bottom-color: var(--teal); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Manual entry form ── */
+    .student-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .subject-rows { margin-bottom: 1rem; }
+    .subject-row {
+      display: grid;
+      grid-template-columns: 2fr 80px 70px 1.5fr 36px;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .subject-row-head {
+      display: grid;
+      grid-template-columns: 2fr 80px 70px 1.5fr 36px;
+      gap: 0.5rem;
+      margin-bottom: 0.35rem;
+    }
+    .subject-row-head span {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .remove-row-btn {
+      width: 32px; height: 32px;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background var(--dur), color var(--dur);
+    }
+    .remove-row-btn:hover { background: var(--danger-light); color: var(--danger); border-color: #fca5a5; }
+
+    @media (max-width: 640px) {
+      .student-info-grid { grid-template-columns: 1fr 1fr; }
+      .subject-row { grid-template-columns: 1fr 70px 60px 36px; }
+      .subject-row .remark-col { display: none; }
+      .subject-row-head .remark-col { display: none; }
+    }
+
+    @media (max-width: 640px) {
+      .upload-grid { grid-template-columns: 1fr; }
+      .hero-stats { grid-template-columns: repeat(3,1fr); gap: 0.5rem; }
+      .hero-stat-value { font-size: 1.4rem; }
+      .dashboard-content { padding: 0 1rem 2rem; }
     }
   </style>
 </head>
-<body>
+<body style="background:var(--bg)">
 
-  <nav class="navbar">
-    <div class="container">
-      <a class="navbar-brand" href="/">
+  <!-- ═══════ LOGIN ═══════ -->
+  <div id="login-screen">
+
+    <!-- Left brand panel -->
+    <div class="login-brand">
+      <div class="brand-logo">
         <div class="dot"></div>
-        Check<span>Result</span>.ng
-      </a>
-      <div id="nav-right" class="navbar-right" style="display:none">
-        <button class="btn btn-outline btn-sm" id="logout-btn">Log out</button>
+        Check<span style="opacity:0.7">Result</span>.ng
+      </div>
+      <div class="brand-tagline">School results,<br>delivered digitally.</div>
+      <p class="brand-sub">Upload results once. Students check instantly with a PIN — anytime, anywhere.</p>
+      <div class="brand-features">
+        <div class="brand-feature">
+          <div class="brand-feature-icon">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          Upload CSV, Excel, or scanned images
+        </div>
+        <div class="brand-feature">
+          <div class="brand-feature-icon">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          Secure PIN-based student access
+        </div>
+        <div class="brand-feature">
+          <div class="brand-feature-icon">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          Auto-generates PINs — no manual work
+        </div>
       </div>
     </div>
-  </nav>
 
-  <!-- Login screen -->
-  <div id="login-screen">
-    <div class="card login-card">
-      <div class="login-header">
-        <div class="icon">
-          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          </svg>
+    <!-- Right form panel -->
+    <div class="login-form-panel">
+      <div class="login-form-inner">
+        <div class="login-form-header">
+          <h1>Admin Portal</h1>
+          <p>Sign in to manage student results</p>
         </div>
-        <h1 style="font-size:1.2rem;margin-bottom:0.3rem">Admin Panel</h1>
-        <p style="font-size:0.85rem;color:var(--text-muted)">Enter your password to continue</p>
+        <div id="login-error" class="alert alert-error" style="display:none;margin-bottom:1.25rem"></div>
+        <form id="login-form">
+          <div class="form-group">
+            <label class="form-label" for="password-input">Admin Password</label>
+            <div class="pw-wrap">
+              <input id="password-input" type="password" class="form-control" placeholder="Enter password" required autofocus>
+              <button type="button" class="pw-toggle" id="pw-toggle" aria-label="Show password">
+                <svg id="eye-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full" id="login-btn" style="height:2.75rem;font-size:0.95rem;font-weight:600">
+            Sign In
+          </button>
+        </form>
+        <p style="text-align:center;font-size:0.78rem;color:var(--text-subtle);margin-top:1.5rem">
+          CheckResult.ng &mdash; School Result Management
+        </p>
       </div>
-      <div id="login-error" class="alert alert-error" style="display:none;margin-bottom:1rem"></div>
-      <form id="login-form">
-        <div class="form-group">
-          <label class="form-label" for="password-input">Password</label>
-          <input id="password-input" type="password" class="form-control" placeholder="••••••••" required autofocus>
-        </div>
-        <button type="submit" class="btn btn-primary btn-full" id="login-btn">Log In</button>
-      </form>
     </div>
   </div>
 
-  <!-- Dashboard screen -->
+  <!-- ═══════ DASHBOARD ═══════ -->
   <div id="dashboard-screen">
-    <div class="page">
 
-      <!-- Stats -->
-      <div class="stats-grid" id="stats-grid">
-        <div class="stat-card">
-          <div class="stat-value" id="stat-students">—</div>
-          <div class="stat-label">Students</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="stat-rows">—</div>
-          <div class="stat-label">Result Rows</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="stat-batches">—</div>
-          <div class="stat-label">Batches</div>
+    <!-- Top bar -->
+    <div class="admin-bar">
+      <a class="admin-bar-brand" href="/" target="_blank">
+        <div class="dot"></div>
+        Check<span>Result</span>.ng
+      </a>
+      <div class="admin-bar-right">
+        <span class="admin-badge">Admin</span>
+        <button class="btn btn-outline btn-sm" id="logout-btn">Log out</button>
+      </div>
+    </div>
+
+    <!-- Hero -->
+    <div class="dashboard-hero">
+      <div class="hero-inner">
+        <div class="hero-title">Dashboard</div>
+        <div class="hero-sub">Manage result uploads and student access</div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-value" id="stat-students">—</div>
+            <div class="hero-stat-label">Students</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value" id="stat-rows">—</div>
+            <div class="hero-stat-label">Result Rows</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value" id="stat-batches">—</div>
+            <div class="hero-stat-label">Batches</div>
+          </div>
         </div>
       </div>
+    </div>
 
-      <!-- Upload -->
-      <div class="card upload-card">
-        <h2 style="margin-bottom:1.25rem">Upload Results CSV</h2>
+    <!-- Cards -->
+    <div class="dashboard-content">
 
-        <div class="file-info">
-          Required columns: <strong>PIN, Student_Name, Subject</strong> &nbsp;|&nbsp;
-          Optional: School, Class, Term, Year, Score, Grade, Remark
-        </div>
-
-        <hr class="divider" style="margin:1rem 0">
-
-        <form id="upload-form">
-          <div class="upload-row">
-            <div class="form-group" style="margin:0">
-              <label class="form-label" for="batch-name">Batch Name</label>
-              <input id="batch-name" type="text" class="form-control" placeholder="e.g. JSS3 First Term 2024/2025">
-            </div>
-            <div class="form-group" style="margin:0">
-              <label class="form-label" for="csv-file">CSV File</label>
-              <input id="csv-file" type="file" class="form-control" accept=".csv" required>
+      <!-- Upload card -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <div class="section-card-header-left">
+            <div class="section-icon">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
             </div>
             <div>
-              <button type="submit" class="btn btn-primary" id="upload-btn" style="white-space:nowrap">Upload</button>
+              <div class="section-title">Upload Results</div>
+              <div class="section-sub">CSV, Excel, or image — PINs auto-generated if missing</div>
             </div>
           </div>
-          <div class="progress-bar-wrap" id="progress-wrap">
-            <div class="progress-bar" id="progress-bar"></div>
-          </div>
-          <div id="upload-result" class="upload-result"></div>
-        </form>
+        </div>
+        <!-- Tabs -->
+        <div class="tab-bar">
+          <button class="tab-btn active" data-tab="manual">Manual Entry</button>
+          <button class="tab-btn" data-tab="upload">Bulk Upload</button>
+        </div>
+
+        <!-- MANUAL ENTRY TAB -->
+        <div class="tab-panel active" id="tab-manual">
+        <div class="section-card-body">
+          <form id="entry-form">
+            <div style="margin-bottom:1rem">
+              <label class="form-label">Batch / Class Name</label>
+              <input id="entry-batch" type="text" class="form-control" placeholder="e.g. JSS3 First Term 2024/2025" style="max-width:420px">
+            </div>
+
+            <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-muted);margin-bottom:0.75rem">Student Details</div>
+            <div class="student-info-grid">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Student Name *</label>
+                <input id="entry-name" type="text" class="form-control" placeholder="e.g. John Doe" required>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Class</label>
+                <input id="entry-class" type="text" class="form-control" placeholder="e.g. JSS3A">
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">School</label>
+                <input id="entry-school" type="text" class="form-control" placeholder="e.g. Royal Academy">
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Term</label>
+                <select id="entry-term" class="form-control">
+                  <option value="">— Select —</option>
+                  <option>First</option>
+                  <option>Second</option>
+                  <option>Third</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Year</label>
+                <input id="entry-year" type="text" class="form-control" placeholder="e.g. 2024/2025">
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">PIN <span style="font-weight:400;color:var(--text-subtle)">(auto if blank)</span></label>
+                <input id="entry-pin" type="text" class="form-control" placeholder="e.g. EX2024001" style="font-family:monospace;text-transform:uppercase">
+              </div>
+            </div>
+
+            <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-muted);margin-bottom:0.75rem">Subjects &amp; Scores</div>
+            <div class="subject-row-head">
+              <span>Subject *</span><span>Score</span><span>Grade</span><span class="remark-col">Remark</span><span></span>
+            </div>
+            <div class="subject-rows" id="subject-rows"></div>
+            <button type="button" class="btn btn-outline btn-sm" id="add-subject-btn" style="margin-bottom:1.25rem">
+              + Add Subject
+            </button>
+
+            <div id="entry-result" style="display:none;margin-bottom:1rem"></div>
+            <div id="entry-pin-panel" class="pin-panel"></div>
+
+            <button type="submit" class="btn btn-primary" id="entry-btn" style="padding:0.7rem 1.75rem;font-weight:600">
+              Save Result
+            </button>
+          </form>
+        </div>
+        </div>
+
+        <!-- BULK UPLOAD TAB -->
+        <div class="tab-panel" id="tab-upload">
+        <div class="section-card-body">
+          <form id="upload-form">
+            <div class="upload-grid">
+              <div class="form-group" style="margin:0">
+                <label class="form-label" for="batch-name">Batch Name</label>
+                <input id="batch-name" type="text" class="form-control" placeholder="e.g. JSS3 First Term 2024/2025">
+                <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.4rem">Leave blank to auto-name</p>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">File</label>
+                <div class="drop-zone" id="drop-zone">
+                  <input id="csv-file" type="file" accept=".csv,.xlsx,.xls,.png,.jpg,.jpeg" required>
+                  <div class="dz-icon">
+                    <svg width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                  </div>
+                  <div class="dz-title" id="dz-title">Click or drag file here</div>
+                  <div class="dz-sub" id="dz-sub">CSV · Excel (.xlsx) · PNG · JPEG</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Column guide chips -->
+            <div style="margin-bottom:0.4rem;font-size:0.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em">Required columns</div>
+            <div class="format-row" style="margin-bottom:1rem">
+              <span class="fmt-chip required">Student_Name</span>
+              <span class="fmt-chip required">Subject</span>
+              <span style="font-size:0.75rem;color:var(--text-subtle);align-self:center">Optional →</span>
+              <span class="fmt-chip">PIN</span>
+              <span class="fmt-chip">School</span>
+              <span class="fmt-chip">Class</span>
+              <span class="fmt-chip">Term</span>
+              <span class="fmt-chip">Year</span>
+              <span class="fmt-chip">Score</span>
+              <span class="fmt-chip">Grade</span>
+              <span class="fmt-chip">Remark</span>
+            </div>
+
+            <div class="progress-bar-wrap" id="progress-wrap">
+              <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div id="upload-result" class="upload-result"></div>
+            <div id="pin-panel" class="pin-panel"></div>
+
+            <div style="margin-top:1.25rem">
+              <button type="submit" class="btn btn-primary" id="upload-btn" style="padding:0.7rem 1.75rem;font-weight:600">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right:0.35rem">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                Upload Results
+              </button>
+            </div>
+          </form>
+        </div>
+        </div><!-- /tab-upload -->
       </div>
 
-      <!-- Batches table -->
-      <div class="card batches-card">
-        <div class="section-header">
-          <h2>Uploaded Batches</h2>
+      <!-- Batches card -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <div class="section-card-header-left">
+            <div class="section-icon">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <rect x="2" y="7" width="20" height="14" rx="2"/>
+                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+              </svg>
+            </div>
+            <div>
+              <div class="section-title">Uploaded Batches</div>
+              <div class="section-sub">All result sets in the system</div>
+            </div>
+          </div>
           <button class="btn btn-outline btn-sm" id="refresh-btn">↻ Refresh</button>
         </div>
-        <div id="batches-container">
+        <div id="batches-container" style="padding:0">
           <div class="empty-state"><p>Loading…</p></div>
         </div>
       </div>
@@ -192,8 +780,8 @@
 
     function escapeHtml(str) {
       return String(str || '')
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
     function showToast(msg, type = 'success') {
@@ -204,9 +792,15 @@
       t._timer = setTimeout(() => t.classList.add('hide'), 3500);
     }
 
-    // ── Auth check on load ──
+    // ── Password toggle ──
+    document.getElementById('pw-toggle').addEventListener('click', () => {
+      const inp = document.getElementById('password-input');
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    });
+
+    // ── Auth check ──
     async function init() {
-      const res = await fetch('/api/admin/status');
+      const res  = await fetch('/api/admin/status');
       const data = await res.json();
       if (data.authenticated) showDashboard();
     }
@@ -214,7 +808,6 @@
     function showDashboard() {
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('dashboard-screen').classList.add('visible');
-      document.getElementById('nav-right').style.display = 'flex';
       loadStats();
       loadBatches();
     }
@@ -223,7 +816,7 @@
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const password = document.getElementById('password-input').value;
-      const btn = document.getElementById('login-btn');
+      const btn   = document.getElementById('login-btn');
       const errEl = document.getElementById('login-error');
 
       btn.disabled = true;
@@ -231,7 +824,7 @@
       errEl.style.display = 'none';
 
       try {
-        const res = await fetch('/api/admin/login', {
+        const res  = await fetch('/api/admin/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ password }),
@@ -248,7 +841,7 @@
         errEl.style.display = 'block';
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Log In';
+        btn.textContent = 'Sign In';
       }
     });
 
@@ -273,15 +866,19 @@
     async function loadBatches() {
       const container = document.getElementById('batches-container');
       container.innerHTML = '<div class="empty-state"><p>Loading…</p></div>';
-
       try {
-        const res    = await fetch('/api/admin/batches');
+        const res     = await fetch('/api/admin/batches');
         const batches = await res.json();
 
         if (!batches.length) {
           container.innerHTML = `
             <div class="empty-state">
-              <p>No batches uploaded yet. Upload a CSV to get started.</p>
+              <svg width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.3" viewBox="0 0 24 24">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+              <p>No batches uploaded yet.<br>Upload a file above to get started.</p>
             </div>`;
           return;
         }
@@ -290,12 +887,17 @@
           <tr>
             <td>
               <div class="batch-name">${escapeHtml(b.name)}</div>
-              <div class="batch-date">${new Date(b.uploaded_at).toLocaleString('en-NG')}</div>
+              <div class="batch-meta">${new Date(b.uploaded_at).toLocaleString('en-NG')}${b.image_path ? ' &nbsp;·&nbsp; 📷 Image attached' : ''}</div>
             </td>
             <td><span class="badge badge-teal">${b.student_count} students</span></td>
-            <td>${b.row_count} rows</td>
+            <td style="color:var(--text-muted)">${b.row_count} rows</td>
             <td>
-              <button class="btn btn-danger" onclick="deleteBatch(${b.id}, this)">Delete</button>
+              <div class="batch-actions">
+                <a href="/api/admin/batches/${b.id}/pins" class="btn btn-outline btn-sm" download title="Download PINs">
+                  PINs CSV
+                </a>
+                <button class="btn btn-danger btn-sm" onclick="deleteBatch(${b.id}, this)">Delete</button>
+              </div>
             </td>
           </tr>
         `).join('');
@@ -305,7 +907,7 @@
             <table>
               <thead>
                 <tr>
-                  <th>Batch Name</th>
+                  <th>Batch</th>
                   <th>Students</th>
                   <th>Rows</th>
                   <th></th>
@@ -321,58 +923,117 @@
 
     async function deleteBatch(id, btn) {
       if (!confirm('Delete this batch and all its results? This cannot be undone.')) return;
-      btn.disabled = true;
-      btn.textContent = '…';
+      btn.disabled = true; btn.textContent = '…';
       try {
         const res = await fetch(`/api/admin/batches/${id}`, { method: 'DELETE' });
         if (res.ok) {
           showToast('Batch deleted.');
-          loadBatches();
-          loadStats();
+          loadBatches(); loadStats();
         } else {
           showToast('Delete failed.', 'error');
-          btn.disabled = false;
-          btn.textContent = 'Delete';
+          btn.disabled = false; btn.textContent = 'Delete';
         }
       } catch {
         showToast('Network error.', 'error');
-        btn.disabled = false;
-        btn.textContent = 'Delete';
+        btn.disabled = false; btn.textContent = 'Delete';
       }
     }
+
+    // ── Drop zone ──
+    const dropZone  = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('csv-file');
+    const dzTitle   = document.getElementById('dz-title');
+    const dzSub     = document.getElementById('dz-sub');
+
+    const ALLOWED = ['.csv','.xlsx','.xls','.png','.jpg','.jpeg'];
+
+    function setFile(file) {
+      if (!file) return;
+      dzTitle.textContent = file.name;
+      dzSub.textContent   = (file.size / 1024).toFixed(1) + ' KB';
+      dropZone.style.borderColor = 'var(--teal)';
+      dropZone.style.background  = 'var(--teal-light)';
+    }
+
+    fileInput.addEventListener('change', () => setFile(fileInput.files[0]));
+    dropZone.addEventListener('dragover',  (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', ()  => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (!file) return;
+      const ext = '.' + file.name.split('.').pop().toLowerCase();
+      if (!ALLOWED.includes(ext)) {
+        showToast('Unsupported file type.', 'error');
+        return;
+      }
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      fileInput.files = dt.files;
+      setFile(file);
+    });
 
     // ── Upload ──
     document.getElementById('upload-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const file = document.getElementById('csv-file').files[0];
+      const file = fileInput.files[0];
       if (!file) return;
 
-      const batchName = document.getElementById('batch-name').value.trim();
-      const btn       = document.getElementById('upload-btn');
-      const resultEl  = document.getElementById('upload-result');
+      const batchName    = document.getElementById('batch-name').value.trim();
+      const btn          = document.getElementById('upload-btn');
+      const resultEl     = document.getElementById('upload-result');
+      const pinPanel     = document.getElementById('pin-panel');
       const progressWrap = document.getElementById('progress-wrap');
       const progressBar  = document.getElementById('progress-bar');
 
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>';
+      btn.innerHTML = '<span class="spinner"></span> Uploading…';
       resultEl.className = 'upload-result';
+      pinPanel.style.display = 'none';
       progressWrap.classList.add('visible');
       progressBar.style.width = '30%';
 
       const form = new FormData();
-      form.append('csv', file);
+      form.append('file', file);
       if (batchName) form.append('batch_name', batchName);
 
       try {
-        progressBar.style.width = '60%';
+        progressBar.style.width = '65%';
         const res  = await fetch('/api/admin/upload', { method: 'POST', body: form });
         const data = await res.json();
         progressBar.style.width = '100%';
 
         if (res.ok) {
+          const extras = [
+            data.image_attached ? 'Image attached.' : '',
+            data.ocr_note       ? data.ocr_note : '',
+          ].filter(Boolean).join(' ');
+
           resultEl.className = 'upload-result visible';
-          resultEl.innerHTML = `<div class="alert alert-success">✓ Uploaded ${data.inserted} rows successfully.</div>`;
+          resultEl.innerHTML = `<div class="alert alert-success">✓ Uploaded ${data.inserted} rows successfully.${extras ? ' ' + extras : ''}</div>`;
+
+          if (data.pins_generated && data.pins_generated.length > 0) {
+            const pinRows = data.pins_generated.map(p => `
+              <div class="pin-row">
+                <span>${escapeHtml(p.student_name)}</span>
+                <span class="pin-val">${escapeHtml(p.pin)}</span>
+              </div>`).join('');
+            pinPanel.innerHTML = `
+              <div class="pin-panel-top">
+                <h3>Auto-generated PINs &mdash; ${data.pins_generated.length} student${data.pins_generated.length > 1 ? 's' : ''}</h3>
+                <a href="/api/admin/batches/${data.batch_id}/pins" class="btn btn-outline btn-sm" download>↓ Download CSV</a>
+              </div>
+              <div class="pin-list">${pinRows}</div>
+              <p class="pin-hint">Share each PIN with the student so they can check their result.</p>`;
+            pinPanel.style.display = 'block';
+          }
+
           document.getElementById('upload-form').reset();
+          dzTitle.textContent = 'Click or drag file here';
+          dzSub.textContent   = 'CSV · Excel (.xlsx) · PNG · JPEG';
+          dropZone.style.borderColor = '';
+          dropZone.style.background  = '';
           loadBatches();
           loadStats();
           showToast(`${data.inserted} rows uploaded.`);
@@ -385,7 +1046,7 @@
         resultEl.innerHTML = '<div class="alert alert-error">Upload failed. Check your connection.</div>';
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Upload';
+        btn.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right:0.35rem"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload Results`;
         setTimeout(() => {
           progressWrap.classList.remove('visible');
           progressBar.style.width = '0%';
@@ -394,8 +1055,133 @@
     });
 
     document.getElementById('refresh-btn').addEventListener('click', () => {
-      loadBatches();
-      loadStats();
+      loadBatches(); loadStats();
+    });
+
+    // ── Tabs ──
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+      });
+    });
+
+    // ── Subject rows ──
+    let subjectCount = 0;
+
+    function addSubjectRow(subject = '', score = '', grade = '', remark = '') {
+      subjectCount++;
+      const id  = subjectCount;
+      const row = document.createElement('div');
+      row.className = 'subject-row';
+      row.id = `srow-${id}`;
+      row.innerHTML = `
+        <input type="text" class="form-control subj-subject" placeholder="e.g. Mathematics" value="${escapeHtml(subject)}">
+        <input type="text" class="form-control subj-score"   placeholder="85"              value="${escapeHtml(score)}" style="text-align:center">
+        <input type="text" class="form-control subj-grade"   placeholder="A"               value="${escapeHtml(grade)}" style="text-align:center;text-transform:uppercase">
+        <input type="text" class="form-control subj-remark remark-col" placeholder="Excellent"    value="${escapeHtml(remark)}">
+        <button type="button" class="remove-row-btn" onclick="removeSubjectRow(${id})" title="Remove">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>`;
+      document.getElementById('subject-rows').appendChild(row);
+    }
+
+    function removeSubjectRow(id) {
+      const el = document.getElementById(`srow-${id}`);
+      if (el) el.remove();
+    }
+
+    document.getElementById('add-subject-btn').addEventListener('click', () => addSubjectRow());
+
+    // Start with 3 blank subject rows
+    addSubjectRow(); addSubjectRow(); addSubjectRow();
+
+    // ── Manual entry submit ──
+    document.getElementById('entry-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn      = document.getElementById('entry-btn');
+      const resultEl = document.getElementById('entry-result');
+      const pinPanel = document.getElementById('entry-pin-panel');
+
+      const subjects = [...document.querySelectorAll('.subject-row')].map(row => ({
+        subject: row.querySelector('.subj-subject').value.trim(),
+        score:   row.querySelector('.subj-score').value.trim(),
+        grade:   row.querySelector('.subj-grade').value.trim(),
+        remark:  row.querySelector('.subj-remark').value.trim(),
+      })).filter(s => s.subject);
+
+      if (subjects.length === 0) {
+        showToast('Add at least one subject.', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Saving…';
+      resultEl.style.display = 'none';
+      pinPanel.style.display = 'none';
+
+      try {
+        const res  = await fetch('/api/admin/entry', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({
+            batch_name:   document.getElementById('entry-batch').value.trim(),
+            student_name: document.getElementById('entry-name').value.trim(),
+            school:       document.getElementById('entry-school').value.trim(),
+            class:        document.getElementById('entry-class').value.trim(),
+            term:         document.getElementById('entry-term').value,
+            year:         document.getElementById('entry-year').value.trim(),
+            pin:          document.getElementById('entry-pin').value.trim().toUpperCase(),
+            subjects,
+          }),
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          resultEl.style.display = 'block';
+          resultEl.innerHTML = `<div class="alert alert-success">✓ Result saved — ${data.inserted} subject${data.inserted > 1 ? 's' : ''} recorded.</div>`;
+
+          if (data.pins_generated && data.pins_generated.length > 0) {
+            const p = data.pins_generated[0];
+            pinPanel.innerHTML = `
+              <div class="pin-panel-top">
+                <h3>Generated PIN for ${escapeHtml(p.student_name)}</h3>
+                <a href="/api/admin/batches/${data.batch_id}/pins" class="btn btn-outline btn-sm" download>↓ Download</a>
+              </div>
+              <div class="pin-list">
+                <div class="pin-row">
+                  <span>${escapeHtml(p.student_name)}</span>
+                  <span class="pin-val">${escapeHtml(p.pin)}</span>
+                </div>
+              </div>
+              <p class="pin-hint">Give this PIN to the student to check their result.</p>`;
+            pinPanel.style.display = 'block';
+          }
+
+          // Reset form (keep batch, school, class, term, year for next student)
+          document.getElementById('entry-name').value = '';
+          document.getElementById('entry-pin').value  = '';
+          document.querySelectorAll('.subject-row').forEach(r => {
+            r.querySelector('.subj-score').value  = '';
+            r.querySelector('.subj-grade').value  = '';
+            r.querySelector('.subj-remark').value = '';
+          });
+
+          loadBatches(); loadStats();
+          showToast('Result saved.');
+        } else {
+          resultEl.style.display = 'block';
+          resultEl.innerHTML = `<div class="alert alert-error">${escapeHtml(data.error)}</div>`;
+        }
+      } catch {
+        resultEl.style.display = 'block';
+        resultEl.innerHTML = '<div class="alert alert-error">Network error. Try again.</div>';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Result';
+      }
     });
 
     init();

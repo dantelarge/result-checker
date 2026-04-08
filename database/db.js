@@ -5,8 +5,6 @@ const path = require('path');
 
 const DATA_FILE = path.join(__dirname, 'data.json');
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
 function load() {
   if (!fs.existsSync(DATA_FILE)) {
     return { batches: [], results: [], _nextBatchId: 1, _nextResultId: 1 };
@@ -18,11 +16,8 @@ function save(data) {
   fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
 }
 
-// ── Public API — mirrors the SQL queries used in routes ───────────────────────
-
 const db = {
 
-  // List all batches with student/row counts
   getBatches() {
     const data = load();
     return data.batches.map(b => {
@@ -36,7 +31,6 @@ const db = {
     }).sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at));
   },
 
-  // Stats
   getStats() {
     const data = load();
     const allPins = new Set(data.results.map(r => r.pin));
@@ -47,12 +41,36 @@ const db = {
     };
   },
 
-  // Insert a batch + rows in one transaction
-  insertBatch(name, rows) {
+  // All unique PINs across the entire database (for auto-PIN sequencing)
+  getAllPins() {
+    const data = load();
+    return [...new Set(data.results.map(r => r.pin))];
+  },
+
+  // Unique PIN + name pairs for a single batch (for PIN download)
+  getBatchPins(batchId) {
+    const data = load();
+    const seen = new Set();
+    const pins = [];
+    for (const r of data.results) {
+      if (r.batch_id === batchId && !seen.has(r.pin)) {
+        seen.add(r.pin);
+        pins.push({ pin: r.pin, student_name: r.student_name });
+      }
+    }
+    return pins;
+  },
+
+  insertBatch(name, rows, imagePath = null) {
     const data = load();
     const id   = data._nextBatchId++;
 
-    data.batches.push({ id, name, uploaded_at: new Date().toISOString() });
+    data.batches.push({
+      id,
+      name,
+      uploaded_at: new Date().toISOString(),
+      image_path:  imagePath,
+    });
 
     for (const row of rows) {
       data.results.push({ id: data._nextResultId++, batch_id: id, ...row });
@@ -62,7 +80,6 @@ const db = {
     return { id, count: rows.length };
   },
 
-  // Delete a batch and its results
   deleteBatch(id) {
     const data = load();
     data.batches = data.batches.filter(b => b.id !== id);
@@ -70,13 +87,11 @@ const db = {
     save(data);
   },
 
-  // Look up results by PIN — returns most recent batch match
   checkPin(pin) {
     const data = load();
     const rows = data.results.filter(r => r.pin === pin.toUpperCase());
     if (rows.length === 0) return null;
 
-    // Find most recently uploaded batch among matches
     const batchIds = [...new Set(rows.map(r => r.batch_id))];
     const latestId = batchIds.sort((a, b) => {
       const ba = data.batches.find(x => x.id === a);
@@ -84,13 +99,14 @@ const db = {
       return new Date(bb.uploaded_at) - new Date(ba.uploaded_at);
     })[0];
 
-    const batch      = data.batches.find(b => b.id === latestId);
-    const batchRows  = rows.filter(r => r.batch_id === latestId)
-                          .sort((a, b) => a.subject.localeCompare(b.subject));
-    const first      = batchRows[0];
+    const batch     = data.batches.find(b => b.id === latestId);
+    const batchRows = rows.filter(r => r.batch_id === latestId)
+                         .sort((a, b) => a.subject.localeCompare(b.subject));
+    const first     = batchRows[0];
 
     return {
       batch_name:   batch.name,
+      image_url:    batch.image_path || null,
       student_name: first.student_name,
       school:       first.school,
       class:        first.class,
