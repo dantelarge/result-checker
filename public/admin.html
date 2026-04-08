@@ -893,9 +893,7 @@
             <td style="color:var(--text-muted)">${b.row_count} rows</td>
             <td>
               <div class="batch-actions">
-                <a href="/api/admin/batches/${b.id}/pins" class="btn btn-outline btn-sm" download title="Download PINs">
-                  PINs CSV
-                </a>
+                ${b.student_count > 0 ? `<a href="/api/admin/batches/${b.id}/pins" class="btn btn-outline btn-sm" download>PINs CSV</a>` : ''}
                 <button class="btn btn-danger btn-sm" onclick="deleteBatch(${b.id}, this)">Delete</button>
               </div>
             </td>

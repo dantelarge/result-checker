@@ -230,7 +230,7 @@ router.post('/upload', requireAuth, upload.single('file'), async (req, res) => {
     }
 
     const batchName = (req.body.batch_name || '').trim() ||
-      `Upload — ${new Date().toLocaleDateString('en-NG')}`;
+      `Upload - ${new Date().toLocaleDateString('en-NG')}`;
 
     const normalized = rows.map(row => ({
       pin:          (row.pin || '').toUpperCase(),
@@ -297,7 +297,7 @@ router.post('/entry', requireAuth, (req, res) => {
 
   const generated = autoPins(rows);
 
-  const name   = (batch_name || '').trim() || `Manual Entry — ${new Date().toLocaleDateString('en-NG')}`;
+  const name   = (batch_name || '').trim() || `Manual Entry - ${new Date().toLocaleDateString('en-NG')}`;
   const result = db.insertBatch(name, rows, null);
 
   res.json({
